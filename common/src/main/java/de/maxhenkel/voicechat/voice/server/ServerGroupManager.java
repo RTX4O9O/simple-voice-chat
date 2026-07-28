@@ -55,7 +55,22 @@ public class ServerGroupManager {
             }
             if (packet.getType() == de.maxhenkel.voicechat.api.Group.Type.ISOLATED || packet.getType() == de.maxhenkel.voicechat.api.Group.Type.NORMAL) {
                 Voicechat.LOGGER.warn("Player {} tried to create prohibited type of group", player.getName());
-                player.sendSystemMessage(Component.literal("[Simple Voice Chat] 該伺服器已停用一般與隔離類型語音頻道").withColor(0xFF5555));
+                switch (player.clientInformation().language()) {
+                    case "zh_tw", "zh_cn":
+                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] 該伺服器已停用一般與隔離類型語音頻道").withColor(0xFF5555));
+                        break;
+                    case "lzh":
+                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] 是伺服器禁一般、隔離之屬語音頻道").withColor(0xFF5555));
+                        break;
+                    case "ja_jp":
+                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] このサーバーではノーマルおよびアイソレートボイスチャットグループタイプが無効になっています。").withColor(0xFF5555));
+                        break;
+                    default:
+                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] This server has disabled normal and isolated voice chat group type.").withColor(0xFF5555));
+                        break;
+
+                }
+
                 return;
             }
             addGroup(new Group(UUID.randomUUID(), packet.getName(), packet.getPassword(), false, false, packet.getType()), player);
