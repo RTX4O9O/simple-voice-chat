@@ -53,6 +53,11 @@ public class ServerGroupManager {
                 Voicechat.LOGGER.warn("Player {} tried to create a group with an invalid password", player.getDisplayName());
                 return;
             }
+            if (packet.getType() == de.maxhenkel.voicechat.api.Group.Type.ISOLATED || packet.getType() == de.maxhenkel.voicechat.api.Group.Type.NORMAL) {
+                Voicechat.LOGGER.warn("Player {} tried to create prohibited type of group", player.getName());
+                player.sendSystemMessage(Component.literal("[Simple Voice Chat] 該伺服器已停用一般與隔離類型語音頻道").withColor(0xFF5555));
+                return;
+            }
             addGroup(new Group(UUID.randomUUID(), packet.getName(), packet.getPassword(), false, false, packet.getType()), player);
         });
         CommonCompatibilityManager.INSTANCE.getNetManager().leaveGroupChannel.setServerListener((player, packet) -> {

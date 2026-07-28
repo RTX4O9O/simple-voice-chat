@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'io.papermc.paperweight.userdev'
+
 }
 
 apply plugin: 'io.papermc.paperweight.userdev'
@@ -63,4 +65,10 @@ compileJava.dependsOn generateJava
 shadowJar {
     relocate 'org.concentus', 'de.maxhenkel.voicechat.concentus'
     exclude 'natives/*-x86/*'
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'net.kyori:adventure-text-serializer-ansi:4.24.0'
+    }
 }

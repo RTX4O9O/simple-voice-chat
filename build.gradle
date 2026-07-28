@@ -44,3 +44,9 @@ tasks.register('05-publishFabric') {
         runGradleTasks(['common:clean', 'common-client:clean', 'fabric:clean', 'fabric:api-stub:clean'], ['fabric:curseforge', 'fabric:modrinth', 'fabric:modUpdate'])
     }
 }
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url = 'https://repo.viaversion.com/' }
+}
