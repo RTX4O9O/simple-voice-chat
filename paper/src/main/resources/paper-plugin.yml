@@ -20,6 +20,15 @@ permissions:
   voicechat.groups:
     description: Use voice chat groups
     default: true
+  voicechat.groups.normal:
+    description: Use normal voice chat groups
+    default: true
+  voicechat.groups.open:
+    description: Use open voice chat groups
+    default: true
+  voicechat.groups.isolated:
+    description: Use isolated voice chat groups
+    default: true
   voicechat.admin:
     description: Use admin commands
     default: op

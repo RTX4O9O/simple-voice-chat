@@ -57,7 +57,17 @@ public interface Group {
          */
         public static final Type ISOLATED = new Type() {
         };
+
+        static String getTypeName(Group.Type type) {
+            if (type == Group.Type.NORMAL) return "normal";
+            if (type == Group.Type.OPEN) return "open";
+            if (type == Group.Type.ISOLATED) return "isolated";
+            return "unknown";
+        }
+
     }
+
+
 
     public interface Builder {
 

@@ -18,19 +18,28 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static de.maxhenkel.voicechat.api.Group.Type.*;
+
 public class ServerGroupManager {
 
     private final Map<UUID, Group> groups;
     private final Server server;
+
+    public void sendMultiLangInvalidGroupTypeMessage(ServerPlayer player, de.maxhenkel.voicechat.api.Group.Type type) {
+        player.displayClientMessage(Component
+            .translatable("message.voicechat.no_group_permission")
+            .append(Component.literal(": "))
+            .append(Component.translatable("message.voicechat.group_type." + de.maxhenkel.voicechat.api.Group.Type.getTypeName(type))), true);
+    }
+
 
     public ServerGroupManager(Server server) {
         this.server = server;
         groups = new ConcurrentHashMap<>();
 
         CommonCompatibilityManager.INSTANCE.getNetManager().joinGroupChannel.setServerListener((player, packet) -> {
-            if (!Voicechat.SERVER_CONFIG.groupsEnabled.get()) {
-                return;
-            }
+            if (!Voicechat.SERVER_CONFIG.groupsEnabled.get()) return;
+            if (getGroup(packet.getGroup()) == null) return;
             if (!PermissionManager.INSTANCE.GROUPS_PERMISSION.hasPermission(player)) {
                 player.displayClientMessage(Component.translatable("message.voicechat.no_group_permission"), true);
                 return;
@@ -38,9 +47,8 @@ public class ServerGroupManager {
             joinGroup(groups.get(packet.getGroup()), player, packet.getPassword());
         });
         CommonCompatibilityManager.INSTANCE.getNetManager().createGroupChannel.setServerListener((player, packet) -> {
-            if (!Voicechat.SERVER_CONFIG.groupsEnabled.get()) {
-                return;
-            }
+            if (!Voicechat.SERVER_CONFIG.groupsEnabled.get()) return;
+
             if (!PermissionManager.INSTANCE.GROUPS_PERMISSION.hasPermission(player)) {
                 player.displayClientMessage(Component.translatable("message.voicechat.no_group_permission"), true);
                 return;
@@ -53,26 +61,22 @@ public class ServerGroupManager {
                 Voicechat.LOGGER.warn("Player {} tried to create a group with an invalid password", player.getDisplayName());
                 return;
             }
-            if (packet.getType() == de.maxhenkel.voicechat.api.Group.Type.ISOLATED || packet.getType() == de.maxhenkel.voicechat.api.Group.Type.NORMAL) {
-                Voicechat.LOGGER.warn("Player {} tried to create prohibited type of group", player.getName());
-                switch (player.clientInformation().language()) {
-                    case "zh_tw", "zh_cn":
-                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] 該伺服器已停用一般與隔離類型語音頻道").withColor(0xFF5555));
-                        break;
-                    case "lzh":
-                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] 是伺服器禁一般、隔離之屬語音頻道").withColor(0xFF5555));
-                        break;
-                    case "ja_jp":
-                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] このサーバーではノーマルおよびアイソレートボイスチャットグループタイプが無効になっています。").withColor(0xFF5555));
-                        break;
-                    default:
-                        player.sendSystemMessage(Component.literal("[Simple Voice Chat] This server has disabled normal and isolated voice chat group type.").withColor(0xFF5555));
-                        break;
-
-                }
-
+            if (!PermissionManager.INSTANCE.GROUPS_NORMAL_PERMISSION.hasPermission(player) && packet.getType() == NORMAL) {
+                Voicechat.LOGGER.warn("Player {} tried to create prohibited type of group {}", player.getName(), de.maxhenkel.voicechat.api.Group.Type.getTypeName(packet.getType()));
+                sendMultiLangInvalidGroupTypeMessage(player, packet.getType());
                 return;
             }
+            if (!PermissionManager.INSTANCE.GROUPS_OPEN_PERMISSION.hasPermission(player) && packet.getType() == OPEN) {
+                Voicechat.LOGGER.warn("Player {} tried to create prohibited type of group {}", player.getName(), de.maxhenkel.voicechat.api.Group.Type.getTypeName(packet.getType()));
+                sendMultiLangInvalidGroupTypeMessage(player, packet.getType());
+                return;
+            }
+            if (!PermissionManager.INSTANCE.GROUPS_ISOLATED_PERMISSION.hasPermission(player) && packet.getType() == ISOLATED) {
+                Voicechat.LOGGER.warn("Player {} tried to create prohibited type of group {}", player.getName(), de.maxhenkel.voicechat.api.Group.Type.getTypeName(packet.getType()));
+                sendMultiLangInvalidGroupTypeMessage(player, packet.getType());
+                return;
+            }
+
             addGroup(new Group(UUID.randomUUID(), packet.getName(), packet.getPassword(), false, false, packet.getType()), player);
         });
         CommonCompatibilityManager.INSTANCE.getNetManager().leaveGroupChannel.setServerListener((player, packet) -> {
