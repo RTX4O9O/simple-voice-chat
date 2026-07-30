@@ -48,6 +48,10 @@ public class PlayerStateManager {
             if (stateOwner != null && !CommonCompatibilityManager.INSTANCE.canSee(receiver, stateOwner)) {
                 continue;
             }
+            // Hide phantom player's state from everyone except self (or admins if you want)
+            if (state.isPhantom() && !receiver.getUUID().equals(state.getUuid())) {
+                continue;
+            }
             NetManager.sendToClient(receiver, packet);
         }
         PluginManager.instance().onPlayerStateChanged(state);
@@ -70,6 +74,9 @@ public class PlayerStateManager {
                 continue;
             }
             if (!CommonCompatibilityManager.INSTANCE.canSee(player, otherPlayer)) {
+                continue;
+            }
+            if (state.isPhantom() && !state.getUuid().equals(player.getUUID())) {
                 continue;
             }
             stateList.add(state);
@@ -143,7 +150,7 @@ public class PlayerStateManager {
     }
 
     public static PlayerState defaultDisconnectedState(ServerPlayer player) {
-        return new PlayerState(player.getUUID(), player.getGameProfile().name(), false, true);
+        return new PlayerState(player.getUUID(), player.getGameProfile().name(), false, true, false);
     }
 
     public void setGroup(ServerPlayer player, @Nullable UUID group) {

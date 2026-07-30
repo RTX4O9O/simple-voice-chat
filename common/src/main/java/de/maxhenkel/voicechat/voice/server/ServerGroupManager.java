@@ -44,7 +44,7 @@ public class ServerGroupManager {
                 player.displayClientMessage(Component.translatable("message.voicechat.no_group_permission"), true);
                 return;
             }
-            joinGroup(groups.get(packet.getGroup()), player, packet.getPassword());
+            joinGroup(groups.get(packet.getGroup()), player, packet.getPassword(), false);
         });
         CommonCompatibilityManager.INSTANCE.getNetManager().createGroupChannel.setServerListener((player, packet) -> {
             if (!Voicechat.SERVER_CONFIG.groupsEnabled.get()) return;
@@ -79,9 +79,7 @@ public class ServerGroupManager {
 
             addGroup(new Group(UUID.randomUUID(), packet.getName(), packet.getPassword(), false, false, packet.getType()), player);
         });
-        CommonCompatibilityManager.INSTANCE.getNetManager().leaveGroupChannel.setServerListener((player, packet) -> {
-            leaveGroup(player);
-        });
+        CommonCompatibilityManager.INSTANCE.getNetManager().leaveGroupChannel.setServerListener((player, packet) -> leaveGroup(player));
     }
 
     public void onPlayerCompatibilityCheckSucceeded(ServerPlayer player) {
@@ -116,7 +114,7 @@ public class ServerGroupManager {
         NetManager.sendToClient(player, new JoinedGroupPacket(group.getId(), false));
     }
 
-    public void joinGroup(@Nullable Group group, ServerPlayer player, @Nullable String password) {
+    public void joinGroup(@Nullable Group group, ServerPlayer player, @Nullable String password, boolean phantom) {
         if (PluginManager.instance().onJoinGroup(player, group)) {
             return;
         }
@@ -125,13 +123,15 @@ public class ServerGroupManager {
             return;
         }
         if (group.getPassword() != null) {
-            if (!group.getPassword().equals(password)) {
+            if (!group.getPassword().equals(password) && !phantom) {
                 NetManager.sendToClient(player, new JoinedGroupPacket(null, true));
                 return;
             }
         }
 
         PlayerStateManager manager = getStates();
+        PlayerState state = manager.getState(player.getUUID());
+        if (state != null) state.setPhantom(phantom);
         manager.setGroup(player, group.getId());
 
         NetManager.sendToClient(player, new JoinedGroupPacket(group.getId(), false));
@@ -143,6 +143,10 @@ public class ServerGroupManager {
         }
 
         PlayerStateManager manager = getStates();
+        PlayerState state = manager.getState(player.getUUID());
+        if (state != null) {
+            state.setPhantom(false);
+        }
         manager.setGroup(player, null);
         NetManager.sendToClient(player, new JoinedGroupPacket(null, false));
 

@@ -16,6 +16,7 @@ public abstract class PermissionManager {
     public final Permission GROUPS_NORMAL_PERMISSION;
     public final Permission GROUPS_OPEN_PERMISSION;
     public final Permission GROUPS_ISOLATED_PERMISSION;
+    public final Permission PHANTOM_JOIN_PERMISSION;
     public final Permission ADMIN_PERMISSION;
 
     protected List<Permission> permissions = new ArrayList<>();
@@ -27,6 +28,7 @@ public abstract class PermissionManager {
         GROUPS_NORMAL_PERMISSION = createPermission(Voicechat.MODID, "groups.normal", PermissionType.EVERYONE);
         GROUPS_OPEN_PERMISSION = createPermission(Voicechat.MODID, "groups.open", PermissionType.EVERYONE);
         GROUPS_ISOLATED_PERMISSION = createPermission(Voicechat.MODID, "groups.isolated", PermissionType.EVERYONE);
+        PHANTOM_JOIN_PERMISSION = createPermission(Voicechat.MODID, "phantom", PermissionType.NOONE);
         ADMIN_PERMISSION = createPermission(Voicechat.MODID, "admin", PermissionType.OPS);
     }
 

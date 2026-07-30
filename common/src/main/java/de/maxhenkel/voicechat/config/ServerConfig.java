@@ -19,6 +19,7 @@ public class ServerConfig {
     public ConfigEntry<Integer> tcpRateLimit;
     public ConfigEntry<Integer> keepAlive;
     public ConfigEntry<Boolean> groupsEnabled;
+    public ConfigEntry<String> phantomJoinKey;
     public ConfigEntry<String> voiceHost;
     public ConfigEntry<Boolean> allowRecording;
     public ConfigEntry<Boolean> spectatorInteraction;
@@ -82,6 +83,11 @@ public class ServerConfig {
         groupsEnabled = builder
                 .booleanEntry("enable_groups", true,
                         "If group chats are allowed"
+                );
+        phantomJoinKey = builder
+                .stringEntry("phantom_join_key", "",
+                        "The key that players need to enter to join the server in phantom mode",
+                        "Leave this empty to disable phantom mode"
                 );
         voiceHost = builder
                 .stringEntry("voice_host", "",

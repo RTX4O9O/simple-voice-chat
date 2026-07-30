@@ -13,6 +13,15 @@ public class PlayerState {
     private boolean disconnected;
     @Nullable
     private UUID group;
+    boolean phantom = false;
+
+    public PlayerState(UUID uuid, String name, boolean disabled, boolean disconnected, boolean phantom) {
+        this.uuid = uuid;
+        this.name = name;
+        this.disabled = disabled;
+        this.disconnected = disconnected;
+        this.phantom = phantom;
+    }
 
     public PlayerState(UUID uuid, String name, boolean disabled, boolean disconnected) {
         this.uuid = uuid;
@@ -66,6 +75,15 @@ public class PlayerState {
         return group != null;
     }
 
+    public boolean isPhantom() {
+        return this.phantom;
+    }
+
+    public void setPhantom(boolean phantom) {
+        this.phantom = phantom;
+    }
+
+
     @Override
     public String toString() {
         return "{" +
@@ -74,12 +92,14 @@ public class PlayerState {
                 ", uuid=" + uuid +
                 ", name=" + name +
                 ", group=" + group +
+                ", phantom = " + phantom +
                 '}';
     }
 
     public static PlayerState fromBytes(FriendlyByteBuf buf) {
         boolean disabled = buf.readBoolean();
         boolean disconnected = buf.readBoolean();
+//        boolean phantom = buf.readBoolean();
         UUID uuid = buf.readUUID();
         String name = buf.readUtf(32767);
 
@@ -95,6 +115,7 @@ public class PlayerState {
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(disabled);
         buf.writeBoolean(disconnected);
+//        buf.writeBoolean(phantom); // new
         buf.writeUUID(uuid);
         buf.writeUtf(name);
         buf.writeBoolean(hasGroup());

@@ -68,7 +68,7 @@ public class VoicechatConnectionImpl implements VoicechatConnection {
                 server.getGroupManager().addGroup(g.getGroup(), serverPlayer);
                 actualGroup = g.getGroup();
             }
-            server.getGroupManager().joinGroup(actualGroup, serverPlayer, g.getGroup().getPassword());
+            server.getGroupManager().joinGroup(actualGroup, serverPlayer, g.getGroup().getPassword(), false);
         }
     }
 

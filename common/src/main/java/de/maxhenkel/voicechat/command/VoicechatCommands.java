@@ -158,7 +158,7 @@ public class VoicechatCommands {
                 return 0;
             }
             String groupName = StringArgumentType.getString(commandSource, "group_name");
-            return joinGroupByName(commandSource.getSource(), groupName, null);
+            return joinGroupByName(commandSource.getSource(), groupName, null, false);
         })));
 
         literalBuilder.then(Commands.literal("join").then(Commands.argument("group_name", StringArgumentType.string()).suggests(GroupNameSuggestionProvider.INSTANCE).then(Commands.argument("password", StringArgumentType.string()).executes((commandSource) -> {
@@ -167,8 +167,15 @@ public class VoicechatCommands {
             }
             String groupName = StringArgumentType.getString(commandSource, "group_name");
             String password = StringArgumentType.getString(commandSource, "password");
-            return joinGroupByName(commandSource.getSource(), groupName, password.isEmpty() ? null : password);
+            return joinGroupByName(commandSource.getSource(), groupName, password.isEmpty() ? null : password, false);
         }))));
+        literalBuilder.then(Commands.literal("phantom").then(Commands.argument("group_name", StringArgumentType.string()).suggests(GroupNameSuggestionProvider.INSTANCE).executes((commandSource) -> {
+            if (checkNoVoicechat(commandSource)) {
+                return 0;
+            }
+            String groupName = StringArgumentType.getString(commandSource, "group_name");
+            return joinGroupByName(commandSource.getSource(), groupName, null, true);
+        })));
 
         literalBuilder.then(Commands.literal("leave").executes((commandSource) -> {
             if (checkNoVoicechat(commandSource)) {
@@ -221,7 +228,7 @@ public class VoicechatCommands {
         return server;
     }
 
-    private static int joinGroupByName(CommandSourceStack source, String groupName, @Nullable String password) throws CommandSyntaxException {
+    private static int joinGroupByName(CommandSourceStack source, String groupName, @Nullable String password, boolean phantom) throws CommandSyntaxException {
         Server server = joinGroup(source);
         if (server == null) {
             return 1;
@@ -239,7 +246,7 @@ public class VoicechatCommands {
             return 1;
         }
 
-        return joinGroup(source, server, groups.get(0).getId(), password);
+        return joinGroup(source, server, groups.get(0).getId(), password, phantom);
     }
 
     private static int joinGroupById(CommandSourceStack source, UUID groupID, @Nullable String password) throws CommandSyntaxException {
@@ -247,18 +254,16 @@ public class VoicechatCommands {
         if (server == null) {
             return 1;
         }
-        return joinGroup(source, server, groupID, password);
+        return joinGroup(source, server, groupID, password, false);
     }
 
-    private static int joinGroup(CommandSourceStack source, Server server, UUID groupID, @Nullable String password) throws CommandSyntaxException {
+    private static int joinGroup(CommandSourceStack source, Server server, UUID groupID, @Nullable String password, boolean phantom) throws CommandSyntaxException {
         Group group = server.getGroupManager().getGroup(groupID);
-
         if (group == null) {
             source.sendFailure(Component.translatable("message.voicechat.group_does_not_exist"));
             return 1;
         }
-
-        server.getGroupManager().joinGroup(group, source.getPlayerOrException(), password);
+        server.getGroupManager().joinGroup(group, source.getPlayerOrException(), password, phantom);
         source.sendSuccess(() -> Component.translatable("message.voicechat.join_successful", Component.literal(group.getName()).withStyle(ChatFormatting.GRAY)), false);
         return 1;
     }
