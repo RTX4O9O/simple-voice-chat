@@ -108,6 +108,7 @@
   "message.voicechat.group_type.isolated": "Isolated",
   "message.voicechat.group_type.isolated.description": "Players who are not in your group can't hear you, and you can't hear them either.",
   "message.voicechat.join_group": "Join Group",
+  "message.voicechat.bf_join_group": "Bruteforce Join Group",
   "message.voicechat.enter_group_password": "Enter Group Password",
   "message.voicechat.password": "Password",
   "message.voicechat.wrong_password": "Incorrect Password",

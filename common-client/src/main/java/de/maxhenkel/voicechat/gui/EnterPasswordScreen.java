@@ -17,11 +17,13 @@ public class EnterPasswordScreen extends VoiceChatScreenBase {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Voicechat.MODID, "textures/gui/gui_enter_password.png");
     private static final Component TITLE = Component.translatable("gui.voicechat.enter_password.title");
     private static final Component JOIN_GROUP = Component.translatable("message.voicechat.join_group");
+    private static final Component BRUTE_FORCE_JOIN = Component.translatable("message.voicechat.bf_join_group");
     private static final Component ENTER_GROUP_PASSWORD = Component.translatable("message.voicechat.enter_group_password");
     private static final Component PASSWORD = Component.translatable("message.voicechat.password");
 
     private EditBox password;
     private Button joinGroup;
+    private Button bruteForceJoin;
     private ClientGroup group;
 
     public EnterPasswordScreen(ClientGroup group) {
@@ -44,10 +46,21 @@ public class EnterPasswordScreen extends VoiceChatScreenBase {
             joinGroup();
         }).bounds(guiLeft + 7, guiTop + ySize - 20 - 7, xSize - 7 * 2, 20).build();
         addRenderableWidget(joinGroup);
+
+        bruteForceJoin = Button.builder(BRUTE_FORCE_JOIN, button -> {
+            bruteForceJoin();
+        }).bounds(guiLeft + 7, guiTop + ySize - 20 - 7, xSize - 7 * 2, 20).build();
+        addRenderableWidget(joinGroup);
     }
 
     private void joinGroup() {
         if (!password.getValue().isEmpty()) {
+            ClientServerNetManager.sendToServer(new JoinGroupPacket(group.getId(), password.getValue()));
+        }
+    }
+
+    private void bruteForceJoin() {
+        if () {
             ClientServerNetManager.sendToServer(new JoinGroupPacket(group.getId(), password.getValue()));
         }
     }

@@ -97,6 +97,7 @@
   "message.voicechat.group_type.isolated": "隔離",
   "message.voicechat.group_type.isolated.description": "不在你的群組中的玩家聽不到你的聲音，你也聽不到他們的聲音。",
   "message.voicechat.join_group": "加入群組",
+  "message.voicechat.bf_join_group": "暴力加入",
   "message.voicechat.enter_group_password": "輸入群組密碼",
   "message.voicechat.password": "密碼",
   "message.voicechat.wrong_password": "密碼錯誤",
